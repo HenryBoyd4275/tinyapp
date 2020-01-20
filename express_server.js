@@ -2,13 +2,14 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
-function generateRandomString() {
+const generateRandomString = function () {
   //returns a random-ish 6 character string
   let result = '';
   let chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
   while (result.length < 6) {
     result += chars.charAt(Math.floor(Math.random() * chars.length))
   }
+  console.log(result);
   return result;
 }
 
@@ -32,12 +33,14 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  //console.log(req.body);  // Log the POST request body to the console
+  let key = generateRandomString();
+  urlDatabase[key] = req.body.longURL;
+  res.redirect(`/urls/:${key}`);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]/* What goes here? */ };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
