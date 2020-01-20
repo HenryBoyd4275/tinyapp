@@ -1,3 +1,11 @@
+//TODO
+/*
+  What would happen if a client requests a non-existent shortURL?
+  What happens to the urlDatabase when the server is restarted?
+  What type of status code do our redirects have? What does this status code mean?
+*/
+
+
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -28,15 +36,13 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 })
 
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
-app.post("/urls", (req, res) => {
-  //console.log(req.body);  // Log the POST request body to the console
-  let key = generateRandomString();
-  urlDatabase[key] = req.body.longURL;
-  res.redirect(`/urls/:${key}`);
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -47,6 +53,13 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+});
+
+app.post("/urls", (req, res) => {
+  //console.log(req.body);  // Log the POST request body to the console
+  let key = generateRandomString();
+  urlDatabase[key] = req.body.longURL;
+  res.redirect(`/urls/:${key}`);
 });
 
 app.get("/hello", (req, res) => {
