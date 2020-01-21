@@ -4,6 +4,8 @@
   What happens to the urlDatabase when the server is restarted?
   What type of status code do our redirects have? What does this status code mean?
   valid URL check from edit
+  give buttons some class
+  order server functions more properly
 */
 
 
@@ -32,6 +34,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
   //"test" : "http://www.example.com"
 };
+
+app.post("/login", (req, res) => {
+  // console.log(req.body.user);
+  let username = res.cookie("username", req.body.user);
+  res.redirect("/urls");
+});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
