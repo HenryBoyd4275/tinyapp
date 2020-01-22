@@ -42,6 +42,10 @@ const getEmail = function (id) {
   return users[id].email;
 }
 
+const getPass = function (id) {
+  return users[id].password;
+}
+
 const emailTaken = function (email) {
   for (element in users) {
     if (email === getEmail(element)) {
@@ -63,10 +67,27 @@ const urlDatabase = {
   //"test" : "http://www.example.com"
 };
 
-// app.post("/login", (req, res) => {
-//   res.cookie("username", req.body.user);
-//   res.redirect("/urls");
-// });
+app.post("/login", (req, res) => {
+  const {email, password} = req.body;
+  console.log(users)
+  console.log(email, password);
+  if (!email || !password) {
+    res.status(400);
+    res.send("invalid input");
+  }
+  for (element in users) {
+    if (email === getEmail(element)) {
+      if (password === getPass(element)) {
+        res.cookie("user_id", element);
+      } else{
+        console.log("invalid password", getPass(element));
+      }
+    }
+  }
+  //for email if pass matches:
+  //res.cookie("user_id", id); for the id
+  res.redirect("/urls");
+});
 
 app.post("/register", (req, res) => {
   const {email, password} = req.body;
@@ -82,6 +103,11 @@ app.post("/register", (req, res) => {
   res.cookie("user_id", id);
   res.redirect("/urls");
   }
+})
+
+app.get("/login", (req, res) => {
+  let templateVars = { user: users[req.cookies.user_id]};
+  res.render("login", templateVars);
 })
 
 app.get("/register", (req, res) => {
