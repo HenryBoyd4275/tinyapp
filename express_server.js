@@ -1,11 +1,11 @@
 //TODO
 /*
-  What would happen if a client requests a non-existent shortURL?
-  What happens to the urlDatabase when the server is restarted?
-  What type of status code do our redirects have? What does this status code mean?
+  handle client request of a non-existent shortURL
+  urlDatabase is lost on restart
   valid URL check from edit
   give buttons some class
   order server functions more properly
+  improve registration UI
 */
 
 
@@ -21,8 +21,34 @@ const generateRandomString = function () {
   while (result.length < 6) {
     result += chars.charAt(Math.floor(Math.random() * chars.length))
   }
-  console.log(result);
+  //console.log(result);
   return result;
+}
+
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+const getEmail = function (id) {
+  return users[id].email;
+}
+
+const emailTaken = function (email) {
+  for (element in users) {
+    if (email === getEmail(element)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 app.set("view engine", "ejs");
@@ -31,27 +57,46 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
   //"test" : "http://www.example.com"
 };
 
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body.user);
+// app.post("/login", (req, res) => {
+//   res.cookie("username", req.body.user);
+//   res.redirect("/urls");
+// });
+
+app.post("/register", (req, res) => {
+  const {email, password} = req.body;
+  if (!email || !password) {
+    res.status(400);
+    res.send("invalid input");
+  } else if (emailTaken(email)) {
+    res.status(400);
+    res.send("Email already in use");
+  } else {
+  let id = generateRandomString();
+  users[id] = {id, email, password};
+  res.cookie("user_id", id);
   res.redirect("/urls");
+  }
+})
+
+app.get("/register", (req, res) => {
+  let templateVars = { user: users[req.cookies.user_id]};
+  res.render("register", templateVars);
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
-})
+});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-})
+});
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
@@ -59,12 +104,12 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"] };
+  let templateVars = { user: users[req.cookies.user_id]};
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies.user_id]};
   res.render("urls_show", templateVars);
 });
 
@@ -74,7 +119,7 @@ app.post("/urls/:shortURL/id", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  let templateVars = { urls: urlDatabase, user: users[req.cookies.user_id]};
   res.render("urls_index", templateVars);
 });
 
