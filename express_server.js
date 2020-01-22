@@ -13,6 +13,7 @@ const express = require("express");
 const cookieParser = require('cookie-parser')
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require('bcrypt');
 
 const generateRandomString = function () {
   //returns a random-ish 6 character string
@@ -29,12 +30,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 
@@ -85,7 +86,7 @@ app.post("/login", (req, res) => {
   }
   for (element in users) {
     if (email === getEmail(element)) {
-      if (password === getPass(element)) {
+      if (bcrypt.compareSync(password, getPass(element))) {
         res.cookie("user_id", element);
         res.redirect("/urls");
       } else{
@@ -98,7 +99,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const {email, password} = req.body;
+  let {email, password} = req.body;
   if (!email || !password) {
     res.status(400);
     res.send("invalid input");
@@ -106,10 +107,11 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.send("Email already in use");
   } else {
-  let id = generateRandomString();
-  users[id] = {id, email, password};
-  res.cookie("user_id", id);
-  res.redirect("/urls");
+    password = bcrypt.hashSync(password, 10);
+    let id = generateRandomString();
+    users[id] = {id, email, password};
+    res.cookie("user_id", id);
+    res.redirect("/urls");
   }
 })
 
