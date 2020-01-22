@@ -79,14 +79,14 @@ app.post("/login", (req, res) => {
     if (email === getEmail(element)) {
       if (password === getPass(element)) {
         res.cookie("user_id", element);
+        res.redirect("/urls");
       } else{
+        res.status(403);
         console.log("invalid password", getPass(element));
       }
     }
   }
-  //for email if pass matches:
-  //res.cookie("user_id", id); for the id
-  res.redirect("/urls");
+  res.status(403);
 });
 
 app.post("/register", (req, res) => {
