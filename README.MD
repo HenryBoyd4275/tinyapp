@@ -9,8 +9,9 @@ The UI is also terrible, this is because HTML stylings were not toe point of thi
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["screenshot of URLS main page"](https://github.com/amorphouscube/tinyapp/blob/master/docs/urls_main.png)
+!["screenshot of create URLS page"](https://github.com/amorphouscube/tinyapp/blob/master/docs/urls_create.png#)
+!["screenshot of URLS edit page"](https://github.com/amorphouscube/tinyapp/blob/master/docs/urls_edit.png)
 
 ## Dependencies
 
