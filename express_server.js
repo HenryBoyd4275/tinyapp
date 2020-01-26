@@ -45,8 +45,8 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls/:shortURL/id", (req, res) => {
-  if (urlDatabase[req.params.shortURL.userID] === req.session.user_id) {
-    urlDatabase[req.params.shortURL] = req.body.editName;
+  if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
+    urlDatabase[req.params.shortURL].longURL = req.body.editName;
     res.redirect("/urls");
   } else {
     if (req.session.user_id) {
@@ -60,7 +60,7 @@ app.post("/urls/:shortURL/id", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (urlDatabase[req.params.shortURL.userID] === req.session.user_id) {
+  if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   } else {
@@ -159,9 +159,12 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
-  if (!email || !password) {
+  if (!email) {
     res.status(400);
-    res.send("invalid input");
+    res.send("Please enter an Email");
+  } else if (!password) {
+    res.status(400);
+    res.send("Please enter a password");
   }
   let currentUser = getUserByEmail(email, users);
   if (currentUser) {
@@ -174,6 +177,7 @@ app.post("/login", (req, res) => {
     }
   } else {
     res.status(403);
+    res.send("That account does not exist");
     res.redirect("/login");
   }
 });
