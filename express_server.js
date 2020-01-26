@@ -17,8 +17,14 @@ app.use(cookieSession({
 
 //SAMPLE DATA
 const urlDatabase = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "userRandomID"},
-  "9sm5xK": {longURL: "http://www.google.com", userID: "userRandomID"}
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca", 
+    userID: "userRandomID"
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com", 
+    userID: "userRandomID"
+  }
 };
 
 const users = {
@@ -44,7 +50,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-app.post("/urls/:shortURL/id", (req, res) => {
+app.post("/urls/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
     urlDatabase[req.params.shortURL].longURL = req.body.editName;
     res.redirect("/urls");
@@ -177,7 +183,7 @@ app.post("/login", (req, res) => {
     }
   } else {
     res.status(403);
-    res.send("That account does not exist");
+    res.send("That account email does not exist");
     res.redirect("/login");
   }
 });
