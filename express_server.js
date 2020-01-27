@@ -50,7 +50,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-app.post("/urls/:shortURL", (req, res) => {
+app.post("/urls/:shortURL/id", (req, res) => {
   if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
     urlDatabase[req.params.shortURL].longURL = req.body.editName;
     res.redirect("/urls");
@@ -179,7 +179,7 @@ app.post("/login", (req, res) => {
       res.redirect("/urls");
     } else {
       res.status(403);
-      res.send("invalid password", currentUser.password);
+      res.send("invalid password");
     }
   } else {
     res.status(403);
